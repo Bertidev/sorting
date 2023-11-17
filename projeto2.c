@@ -95,41 +95,219 @@ void ShellSort(info* array, long int size)
     }
 }
 
+unsigned long int GetMax(info* array, long int size) 
+{
+    unsigned long int max = array[0].key;
+
+    for (int i = 1; i < size; i++)
+    {
+        if (array[i].key > max)
+        {
+            max = array[i].key;
+        }
+    }
+    return max;
+}
+
+void CountingSort(info* array, long int size, unsigned long int place) 
+{
+    long int output[size + 1];
+    unsigned long int max = array[0].key % 10;
+    unsigned long int i;
+
+    for (i = 1; i < (unsigned long int)size; i++) 
+    {
+        if ((array[i].key % 10) > max)
+        {
+            max = array[i].key % 10;
+        }
+    }
+
+    unsigned long int count[max + 1];
+
+    for (i = 0; i <= max; ++i)
+    {
+        count[i] = 0;
+    }
+
+    for (i = 0; i < (unsigned long int)size; i++)
+    {
+        count[(array[i].key / place) % 10]++;
+    }    
+
+    for (i = max; i > 0; i--)
+    {
+        count[i - 1] += count[i];
+    }
+  
+    for (i = size - 1; (long int)i >= 0; i--) 
+    {
+        output[count[(array[i].key / place) % 10] - 1] = array[i].key;
+        count[(array[i].key / place) % 10]--;
+    }
+
+    for (int i = 0; i < size; i++)
+    {
+        array[i].key = output[i];
+    }
+}
+
+void RadixSort(info* array, long int size) 
+{
+    unsigned long int max = GetMax(array, size);
+    unsigned long int i;
+    for (i = 1; max/i > 0; i*=10)
+    {
+        CountingSort(array, size, i);
+    }
+}
+
+void merge(info* array, info* c, long int i, long int m, long int f)
+{
+    long int z, iv=i, ic=m+1;
+    for(z=i; z<= f; z++)
+    {
+        c[z].key = array[z].key;
+    }
+    z = i;
+    while(iv<=m && ic<= f)
+    {
+        if(c[iv].key >= c[ic].key) 
+        {
+            array[z++].key = c[iv++].key;
+        }
+        else
+        {
+            array[z++].key = c[ic++].key;
+        }
+    }
+
+    while(iv <= m)
+    {
+        array[z++].key = c[iv++].key;
+    }
+    
+    while(ic <= f)
+    {
+        array[z++].key = c[ic++].key;
+    }
+}
+
+void sort(info* array, info* c, long int i, long int f)
+{
+    if(i < f)
+    {
+        long int m = (i+f)/2;
+        sort(array,c,i,m);
+        sort(array,c,m+1,f);
+        if(array[m].key < array[m+1].key) 
+        {
+            merge(array,c,i,m,f);
+        }
+    }
+}
+
+void MergeSort(info* array, long int size)
+{
+    info* c = malloc(sizeof(info)*size);
+    sort(array,c,0,size-1);
+    free(c);
+}
+
+long int partition(info* array, long int low, long int high, long int mid) 
+{
+    unsigned long int pivot = array[mid].key;
+
+    swap(array, mid, high);
+
+    long int i = low - 1;
+
+    for (long int j = low; j <= high - 1; j++) 
+    {
+        if (array[j].key >= pivot) 
+        {
+            i++;
+            swap(array, i, j);
+        }
+    }
+    swap(array, i + 1, high);
+    return (i + 1);
+}
+
+void QuickSort(info* array, long int low, long int high) 
+{
+    if (low < high) 
+    {
+        long int mid = (low + high) / 2;
+
+        long int pi = partition(array, low, high, mid);
+        
+        QuickSort(array, low, pi - 1);
+        QuickSort(array, pi + 1, high);
+    }
+}
+
+void unordered (long int size, int seed)
+{
+    info* array = create_vet(size,seed);
+    clock_t begin = clock();
+    InsertionSort(array,size);
+    clock_t end = clock();
+    double insert = (double)(end - begin) / CLOCKS_PER_SEC;
+    free(array);
+    printf("tempo da insertionsort: %f\n",insert);
+    
+    info* array2 = create_vet(size,seed);
+    clock_t begin2 = clock();
+    BubbleSort(array2,size);
+    clock_t end2 = clock();
+    double bubble = (double)(end2 - begin2) / CLOCKS_PER_SEC;
+    free(array2);
+    printf("tempo da bubblesort: %f\n",bubble);
+
+    info* array3 = create_vet(size,seed);
+    clock_t begin3 = clock();
+    ShellSort(array3,size);
+    clock_t end3 = clock();
+    double shell = (double)(end3 - begin3) / CLOCKS_PER_SEC;
+    free(array3);
+    printf("tempo da shellsort: %f\n",shell);
+
+    info* array4 = create_vet(size,seed);
+    clock_t begin4 = clock();
+    RadixSort(array4,size);
+    clock_t end4 = clock();
+    double radix = (double)(end4 - begin4) / CLOCKS_PER_SEC;
+    free(array4);
+    printf("tempo da radixsort: %f\n",radix);
+
+    info* array5 = create_vet(size,seed);
+    clock_t begin5 = clock();
+    QuickSort(array5,0,size-1);
+    clock_t end5 = clock();
+    double quick = (double)(end5 - begin5) / CLOCKS_PER_SEC;
+    free(array5);
+    printf("tempo da quicksort: %f\n",quick);
+
+    info* array6 = create_vet(size,seed);
+    clock_t begin6 = clock();
+    MergeSort(array6,size);
+    clock_t end6 = clock();
+    double merge = (double)(end6 - begin6) / CLOCKS_PER_SEC;
+    free(array6);
+    printf("tempo da mergesort: %f\n",merge);
+}
 
 int main ()
 {
-    info* ten1 = create_vet (10000,22);
-    /*info* ten2 = create_vet (10000,19);
-    info* fift1 = create_vet (50000,45);
-    info* fift2 = create_vet (50000,41);*/
-    //info* hund1 = create_vet (100000,89);
-    /*info* hund2 = create_vet (100000,11);
-    info* five1 = create_vet (500000,60);
-    info* five2 = create_vet (500000,13);*/
-    //info* mil1 = create_vet (1000000,39);
-   /* info* mil2 = create_vet (1000000,1);
+    printf("Tipo 1 com tamanho 10 mil: \n");
+    unordered(10000,22);
 
-    info* ten_ord1 = create_ord (10000,5);
-    info* ten_ord2 = create_ord (10000,7);
-    info* fift_ord1 = create_ord (50000,32);
-    info* fift_ord2 = create_ord (50000,42);
-    info* hund_ord1 = create_ord (100000,3);
-    info* hund_ord2 = create_ord (100000,4);
-    info* five_ord1 = create_ord (500000,59);
-    info* five_ord2 = create_ord (500000,87);
-    info* mil_ord1 = create_ord (1000000,10);
-    info* mil_ord2 = create_ord (1000000,91);*/
-
-    printf ("criacao dos vetores concluida");
-    unsigned long int i;
     //InsertionSort(ten1,10000);
     //BubbleSort(ten1,10000);
-    ShellSort(ten1,10000);
-    printf("sorting concluido");
-    for(i=0; i<10000; i++)
-    {
-        printf("%lu, ", ten1[i].key);
-    }
-    printf("i=%lu",i);
+    //ShellSort(ten1,10000);
+    //RadixSort(ten1,10000);
+    //MergeSort(ten1,10000);
+    //QuickSort(ten1,0,9999);
     return 0;
 }
