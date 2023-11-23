@@ -300,7 +300,7 @@ long int partition (info *array, long int LI, long int LS)
     return e;
 }
 
-long int partitionupper (info *array, long int LI, long int LS)
+int partitionupper (info *array, long int LI, long int LS)
 {
     info aux;
     unsigned long int pivot;
@@ -365,8 +365,8 @@ void quicksortupper (info *array, int LI, int LS)
 {
     while (LI < LS)
     {
-        long int p = partitionupper(array, LI, LS);
-        if  (p- LI < LS - p)
+        int p = partitionupper(array, LI, LS);
+        if  (p-LI < LS-p)
         {
             quicksortupper(array, LI, p-1);
             LI = p +1;
