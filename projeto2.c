@@ -384,7 +384,7 @@ void quickrandom(long int size, int seed,FILE *arquivo)
 {
     struct timespec begin, end;
     printf("VETOR DE TAMANHO %ld\n",size);
-    fprintf(arquivo,"VETOR DE TAMANHO %ld\n");
+    fprintf(arquivo,"VETOR DE TAMANHO %ld\n",size);
     info* vetor = create_vet(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
     quicksortlower(vetor,0,size-1);
