@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
+#include <sys/stat.h>
 
 typedef struct informacao
 {
@@ -379,10 +380,11 @@ void quicksortupper (info *array, int LI, int LS)
     }
 }
 
-void quickrandom(long int size, int seed)
+void quickrandom(long int size, int seed,FILE *arquivo)
 {
     struct timespec begin, end;
     printf("VETOR DE TAMANHO %ld\n",size);
+    fprintf(arquivo,"VETOR DE TAMANHO %ld\n");
     info* vetor = create_vet(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
     quicksortlower(vetor,0,size-1);
@@ -390,6 +392,7 @@ void quickrandom(long int size, int seed)
     double lower = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor);
     printf("\tPivo LI: %f\n", lower);
+    fprintf(arquivo,"\tPivo LI: %f\n", lower);
 
     info* vetor2 = create_vet(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -398,6 +401,7 @@ void quickrandom(long int size, int seed)
     double middle = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor2);
     printf("\tPivo meio: %f\n", middle);
+    fprintf(arquivo,"\tPivo meio: %f\n", middle);
 
     info* vetor3 = create_vet(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -406,12 +410,14 @@ void quickrandom(long int size, int seed)
     double upper = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor3);
     printf("\tPivo LS: %f\n\n", upper);
+    fprintf(arquivo,"\tPivo LS: %f\n\n", upper);
 }
 
-void quickordered(long int size, int seed)
+void quickordered(long int size, int seed,FILE *arq)
 {
     struct timespec begin, end;
     printf("VETOR DE TAMANHO %ld\n",size);
+    fprintf(arq,"VETOR DE TAMANHO %ld\n",size);
     info* vetor = create_ord(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
     quicksortlower(vetor,0,size-1);
@@ -419,6 +425,7 @@ void quickordered(long int size, int seed)
     double lower = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor);
     printf("\tPivo LI: %f\n", lower);
+    fprintf(arq,"\tPivo LI: %f\n", lower);
 
     info* vetor2 = create_ord(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -427,6 +434,7 @@ void quickordered(long int size, int seed)
     double middle = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor2);
     printf("\tPivo meio: %f\n", middle);
+    fprintf(arq,"\tPivo meio: %f\n", middle);
 
     info* vetor3 = create_ord(size,seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -435,9 +443,10 @@ void quickordered(long int size, int seed)
     double upper = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(vetor3);
     printf("\tPivo LS: %f\n", upper);
+    fprintf(arq,"\tPivo LS: %f\n", upper);
 }
 
-void unordered(long int size, int seed)
+void unordered(long int size, int seed, FILE *file)
 {
     struct timespec begin, end;
 
@@ -448,6 +457,7 @@ void unordered(long int size, int seed)
     double insert = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array);
     printf("\tTempo da insertionsort: %f\n", insert);
+    fprintf(file,"\tTempo da insertionsort: %f\n", insert);
 
     info* array2 = create_vet(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -456,6 +466,7 @@ void unordered(long int size, int seed)
     double bubble = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array2);
     printf("\tTempo da bubblesort: %f\n", bubble);
+    fprintf(file,"\tTempo da bubblesort: %f\n", bubble);
 
     info* array3 = create_vet(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -464,6 +475,7 @@ void unordered(long int size, int seed)
     double shell = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array3);
     printf("\tTempo da shellsort: %f\n", shell);
+    fprintf(file,"\tTempo da shellsort: %f\n", shell);
 
     info* array4 = create_vet(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -472,6 +484,7 @@ void unordered(long int size, int seed)
     double radix = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array4);
     printf("\tTempo da radixsort: %f\n", radix);
+    fprintf(file,"\tTempo da radixsort: %f\n", radix);
 
     info* array5 = create_vet(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -480,6 +493,7 @@ void unordered(long int size, int seed)
     double quick = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array5);
     printf("\tTempo da quicksort: %f\n", quick);
+    fprintf(file,"\tTempo da quicksort: %f\n", quick);
 
     info* array6 = create_vet(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -488,34 +502,46 @@ void unordered(long int size, int seed)
     double merge = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array6);
     printf("\tTempo da mergesort: %f\n", merge);
+    fprintf(file,"\tTempo da mergesort: %f\n", merge);
 }
 
-void all_unordered (long int size)
+void all_unordered (long int size,FILE *fp)
 {
     printf("Tipo 1 com tamanho %ld (1): \n",size);
-    unordered(size,12);
+    fprintf(fp,"Tipo 1 com tamanho %ld (1): \n",size);
+    unordered(size,12,fp);
     printf("Tipo 1 com tamanho %ld (2): \n",size);
-    unordered(size,54);
+    fprintf(fp,"Tipo 1 com tamanho %ld (2): \n",size);
+    unordered(size,54,fp);
     printf("Tipo 1 com tamanho %ld (3): \n",size);
-    unordered(size,59);
+    fprintf(fp,"Tipo 1 com tamanho %ld (3): \n",size);
+    unordered(size,59,fp);
     printf("Tipo 1 com tamanho %ld (4): \n",size);
-    unordered(size,41);
+    fprintf(fp,"Tipo 1 com tamanho %ld (4): \n",size);
+    unordered(size,41,fp);
     printf("Tipo 1 com tamanho %ld (5): \n",size);
-    unordered(size,75);
+    fprintf(fp,"Tipo 1 com tamanho %ld (5): \n",size);
+    unordered(size,75,fp);
     printf("Tipo 1 com tamanho %ld(6): \n",size);
-    unordered(size,97);
+    fprintf(fp,"Tipo 1 com tamanho %ld (6): \n",size);
+    unordered(size,97,fp);
     printf("Tipo 1 com tamanho %ld (7): \n",size);
-    unordered(size,71);
+    fprintf(fp,"Tipo 1 com tamanho %ld (7): \n",size);
+    unordered(size,71,fp);
     printf("Tipo 1 com tamanho %ld (8): \n",size);
-    unordered(size,74);
+    fprintf(fp,"Tipo 1 com tamanho %ld (8): \n",size);
+    unordered(size,74,fp);
     printf("Tipo 1 com tamanho %ld (9): \n",size);
-    unordered(size,44);
+    fprintf(fp,"Tipo 1 com tamanho %ld (9): \n",size);
+    unordered(size,44,fp);
     printf("Tipo 1 com tamanho %ld (10): \n",size);
-    unordered(size,24);
+    fprintf(fp,"Tipo 1 com tamanho %ld (10): \n",size);
+    unordered(size,24,fp);
     printf("Sorting dos vetores de tamanho %ld concluido\n\n",size);
+    fprintf(fp,"Sorting dos vetores de tamanho %ld concluido\n\n",size);
 }
 
-void ordered(long int size, int seed)
+void ordered(long int size, int seed, FILE *file)
 {
     struct timespec begin, end;
 
@@ -526,6 +552,7 @@ void ordered(long int size, int seed)
     double insert = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array);
     printf("\tTempo da insertionsort: %f\n", insert);
+    fprintf(file,"\tTempo da insertionsort: %f\n", insert);
 
     info* array2 = create_ord(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -534,6 +561,7 @@ void ordered(long int size, int seed)
     double bubble = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array2);
     printf("\tTempo da bubblesort: %f\n", bubble);
+    fprintf(file,"\tTempo da bubblesort: %f\n", bubble);
 
     info* array3 = create_ord(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -542,6 +570,7 @@ void ordered(long int size, int seed)
     double shell = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array3);
     printf("\tTempo da shellsort: %f\n", shell);
+    fprintf(file,"\tTempo da shellsort: %f\n", shell);
 
     info* array4 = create_ord(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -550,6 +579,7 @@ void ordered(long int size, int seed)
     double radix = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array4);
     printf("\tTempo da radixsort: %f\n", radix);
+    fprintf(file,"\tTempo da radixsort: %f\n", radix);
 
     info* array5 = create_ord(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -558,6 +588,7 @@ void ordered(long int size, int seed)
     double quick = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array5);
     printf("\tTempo da quicksort: %f\n", quick);
+    fprintf(file,"\tTempo da quicksort: %f\n", quick);
 
     info* array6 = create_ord(size, seed);
     clock_gettime(CLOCK_MONOTONIC, &begin);
@@ -566,62 +597,85 @@ void ordered(long int size, int seed)
     double merge = (end.tv_sec - begin.tv_sec) + (end.tv_nsec - begin.tv_nsec) / 1e9;
     free(array6);
     printf("\tTempo da mergesort: %f\n", merge);
+    fprintf(file,"\tTempo da mergesort: %f\n", merge);
 }
 
-void all_ordered (long int size)
+void all_ordered (long int size,FILE *fp)
 {
     printf("Tipo 2 com tamanho %ld (1): \n",size);
-    ordered(size,95);
+    fprintf(fp,"Tipo 2 com tamanho %ld (1): \n",size);
+    ordered(size,128,fp);
     printf("Tipo 2 com tamanho %ld (2): \n",size);
-    ordered(size,72);
+    fprintf(fp,"Tipo 2 com tamanho %ld (2): \n",size);
+    ordered(size,142,fp);
     printf("Tipo 2 com tamanho %ld (3): \n",size);
-    ordered(size,66);
+    fprintf(fp,"Tipo 2 com tamanho %ld (3): \n",size);
+    ordered(size,110,fp);
     printf("Tipo 2 com tamanho %ld (4): \n",size);
-    ordered(size,77);
+    fprintf(fp,"Tipo 2 com tamanho %ld (4): \n",size);
+    ordered(size,133,fp);
     printf("Tipo 2 com tamanho %ld (5): \n",size);
-    ordered(size,19);
+    fprintf(fp,"Tipo 2 com tamanho %ld (5): \n",size);
+    ordered(size,102,fp);
     printf("Tipo 2 com tamanho %ld(6): \n",size);
-    ordered(size,85);
+    fprintf(fp,"Tipo 2 com tamanho %ld (6): \n",size);
+    ordered(size,115,fp);
     printf("Tipo 2 com tamanho %ld (7): \n",size);
-    ordered(size,40);
+    fprintf(fp,"Tipo 2 com tamanho %ld (7): \n",size);
+    ordered(size,131,fp);
     printf("Tipo 2 com tamanho %ld (8): \n",size);
-    ordered(size,7);
+    fprintf(fp,"Tipo 2 com tamanho %ld (8): \n",size);
+    ordered(size,106,fp);
     printf("Tipo 2 com tamanho %ld (9): \n",size);
-    ordered(size,90);
+    fprintf(fp,"Tipo 2 com tamanho %ld (9): \n",size);
+    ordered(size,144,fp);
     printf("Tipo 2 com tamanho %ld (10): \n",size);
-    ordered(size,33);
+    fprintf(fp,"Tipo 2 com tamanho %ld (10): \n",size);
+    ordered(size,112,fp);
     printf("Sorting dos vetores de tamanho %ld concluido\n\n",size);
+    fprintf(fp,"Sorting dos vetores de tamanho %ld concluido\n\n",size);
 }
 
 int main ()
 {
+    FILE *fp;
+    int result;
+    fp = fopen("log.txt","w+");
+
+    printf("Sera gerado um arquivo (.txt) com todas as saidas do programa na pasta que o programa esta\nAperte enter para iniciar");
+    getchar();
     system("cls");
+    
     printf("Teste para escolha do pivo para a quicksort com vetor aleatorio: \n");
-    quickrandom(10000,13);
-    quickrandom(50000,13);
-    quickrandom(100000,13);
-    quickrandom(500000,13);
-    quickrandom(1000000,13);
+    fprintf(fp,"Teste para escolha do pivo para a quicksort com vetor aleatorio: \n");
+    quickrandom(10000,13,fp);
+    quickrandom(50000,13,fp);
+    quickrandom(100000,13,fp);
+    quickrandom(500000,13,fp);
+    quickrandom(1000000,13,fp);
 
     printf("\nTeste para escolha do pivo para a quicksort com vetor ordenado: \n");
-    quickordered(10000,13);
-    quickordered(50000,13);
-    quickordered(100000,13);
-    quickordered(500000,13);
-    quickordered(1000000,13);
+    fprintf(fp,"\nTeste para escolha do pivo para a quicksort com vetor ordenado: \n");
+    quickordered(10000,13,fp);
+    quickordered(50000,13,fp);
+    quickordered(100000,13,fp);
+    quickordered(500000,13,fp);
+    quickordered(1000000,13,fp);
     printf("\n");
+    fprintf(fp,"\n");
 
-    all_unordered(10000);
-    all_unordered(50000);
-    all_unordered(100000);
-    all_unordered(500000);
-    all_unordered(1000000);
+    all_unordered(10000,fp);
+    all_unordered(50000,fp);
+    all_unordered(100000,fp);
+    all_unordered(500000,fp);
+    all_unordered(1000000,fp);
 
-    all_ordered(10000);
-    all_ordered(50000);
-    all_ordered(100000);
-    all_ordered(500000);
-    all_ordered(1000000);
+    all_ordered(10000,fp);
+    all_ordered(50000,fp);
+    all_ordered(100000,fp);
+    all_ordered(500000,fp);
+    all_ordered(1000000,fp);
 
+    fclose(fp);
     return 0;
 }
